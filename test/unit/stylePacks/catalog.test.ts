@@ -7,6 +7,7 @@ import { parseStylePack, formatStylePack } from '../../../src/stylePacks/validat
 import { RENDERER_PACK } from '../../../src/stylePacks/code/example';
 import { LYRIC_TEMPLATE_PACK } from '../../../src/stylePacks/code/lyricTemplate';
 import { EXAMPLE_PACK } from '../../../src/stylePacks/example';
+import { callTool } from '../../../dev/stylePacks/mcp/tools.mjs';
 
 // Classify by the user's intended role while keeping older files and the player's stored IDs stable.
 describe('personality and lyric-template contract', () => {
@@ -28,5 +29,14 @@ describe('personality and lyric-template contract', () => {
             }
         }
         expect(parseStylePack(JSON.stringify(LYRIC_TEMPLATE_PACK)).kind).toBe('lyric-template');
+    });
+    it('serves filtered catalogs and category-aware briefs through real tool validation', async () => {
+        const templates = JSON.parse((await callTool('folia_style_catalog', { kind: 'lyric-template' })).content[0].text);
+        expect(templates.entries).toHaveLength(11);
+        const result = JSON.parse((await callTool('folia_style_brief', { task: 'test', kind: 'personality', lyricTemplate: 'classic' })).content[0].text);
+        expect(result.kind).toBe('personality'); expect(result.lyricTemplate).toBe('classic');
+        expect(result.guidance.some((item: { uri: string }) => item.uri === 'folia-style://taxonomy')).toBe(true);
+        await expect(callTool('folia_style_brief', { task: 'test', lyricTemplate: 'hanabi' })).rejects.toThrow();
+        await expect(callTool('folia_style_catalog', { kind: 'random' })).rejects.toThrow();
     });
 });

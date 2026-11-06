@@ -180,6 +180,8 @@ Linux 包、Wayland / Hyprland 遥控窗和桌面端细节见 [技术与开发�
 
 播放器可导入和切换风格包；选择器区分完整视觉设计“个性”和歌词模板“样式”。
 
+Agent 可接入[风格 MCP](docs/style-pack-mcp.md)，获取设计规范、源码参考和只读检查；支持 stdio 与认证的本机 HTTP。
+
 ## 模组系统（Folium v1.x）
 
 > [!NOTE]
