@@ -1,12 +1,11 @@
-import { copyFile, mkdir, readFile } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
+import { copyFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { root } from '../mcp/content.mjs';
 import { exportClients } from '../mcp/exportClients.mjs';
 import { diagnose } from '../mcp/diagnose.mjs';
 import { selfTest } from './selfTest.mjs';
-import { runCodex as codex } from './codex.mjs';
+import { configureCodex } from './codex.mjs';
 
 // Installed commands use the bundled runtime; client configuration always points at its absolute path.
 const server = path.join(root, 'dev/folium/mcp/server.mjs');
@@ -32,22 +31,8 @@ try {
         const out = path.resolve(args[0] ?? path.join(data, 'client-configs'));
         await exportClients(out);
         console.info(`[FoliumMCP] Client profiles: ${out}`);
-    } else if (command === 'connect-codex') {
-        const entries = JSON.parse(codex(['mcp', 'list', '--json']));
-        const current = entries.find(entry => entry.name === 'folium-authoring');
-        if (current && (current.transport?.command !== process.execPath || current.transport?.args?.length !== 1 || current.transport.args[0] !== server)) {
-            throw new Error('folium-authoring already belongs to another installation. Review the exported config; no configuration changed.');
-        }
-        await backupCodex();
-        console.info(codex(['mcp', 'add', 'folium-authoring', '--', process.execPath, server]));
-    } else if (command === 'disconnect-codex') {
-        const entry = JSON.parse(codex(['mcp', 'get', 'folium-authoring', '--json']));
-        const transport = entry.transport;
-        if (transport?.command !== process.execPath || transport?.args?.length !== 1 || transport.args[0] !== server) {
-            throw new Error('folium-authoring belongs to another installation; no configuration changed.');
-        }
-        await backupCodex();
-        console.info(codex(['mcp', 'remove', 'folium-authoring']));
+    } else if (command === 'connect-codex' || command === 'disconnect-codex') {
+        console.info(await configureCodex(command === 'connect-codex' ? 'connect' : 'disconnect', { server, backup: backupCodex }));
     } else if (command === 'studio') {
         const entry = path.join(root, 'dev/folium/studio/cli.mjs');
         process.argv = [process.execPath, entry, ...(args.length ? args : [path.join(root, 'mods/sample-aurora-visualizer')])];

@@ -9,7 +9,7 @@ export function createPreviewContext(container: HTMLElement, modId: string, stat
     const changes = new Set<() => void>(), times = new Set<(time: number) => void>();
     const fields = sanitizeFoliumParams(schema, modId);
     let settings: FoliumSettingValues = mergeFoliumParamValues(fields, state.settings), current = state;
-    const lineIndex = () => current.lines.findIndex(line => current.time >= line.startTime && current.time < line.renderHints.renderEndTime);
+    const lineIndex = () => activeLineIndex(current.lines, current.time);
     const spectrum = new Uint8Array(32), bands = { bass: 0, lowMid: 0, mid: 0, vocal: 0, treble: 0 };
     const power = () => lineIndex() < 0 ? 0 : .35 + Math.sin(current.time * 5) * .2;
     const host: FoliumHostContext<FoliumStageContext> = {
@@ -34,4 +34,14 @@ export function createPreviewContext(container: HTMLElement, modId: string, stat
             if (previous.time !== next.time) for (const notify of [...times]) notify(next.time);
         },
     };
+}
+
+// Active lyric windows exclude visual tails; gaps must report -1 to the public context.
+export function activeLineIndex(lines: readonly FoliumLine[], time: number) {
+    return lines.findIndex(line => time >= line.startTime && time < line.endTime);
+}
+
+// A new fixture is a new song; stale static indices and playback state must not survive it.
+export function replaceLyrics(state: PreviewState, lines: FoliumLine[], duration: number): PreviewState {
+    return { ...state, lines, duration, time: 0, paused: true, staticMode: false, staticLineIndex: null };
 }

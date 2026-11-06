@@ -1,5 +1,5 @@
 import { fixture, theme, display, validateLines } from './fixtures';
-import type { PreviewState } from './previewContext';
+import { replaceLyrics, type PreviewState } from './previewContext';
 import { t, labels } from './locales';
 import { download } from './download';
 import { mountVideoReference } from './videoReference';
@@ -65,7 +65,7 @@ find<HTMLInputElement>('scale').oninput = event => { state = { ...state, display
 find('light').onclick = () => { const daylight = !state.theme.isDaylight; state = { ...state, theme: { ...state.theme, isDaylight: daylight, backgroundColor: daylight ? '#eef0f4' : '#101522', primaryColor: daylight ? '#15223c' : '#edf0f7' } }; update(); };
 find('hide').onclick = () => { state = { ...state, display: { ...state.display, showText: !state.display.showText } }; update(); };
 find('still').onclick = () => { state = { ...state, staticMode: !state.staticMode, staticLineIndex: state.staticMode ? null : Math.max(0, state.lines.findIndex(line => state.time >= line.startTime && state.time < line.endTime)), paused: true }; update(); };
-for (const kind of ['normal', 'long', 'rtl', 'instrumental']) find(kind).onclick = () => { fixtureVersion++; state = { ...state, lines: fixture(kind), time: 0, paused: true, duration: 40 }; find<HTMLInputElement>('time').max = '40'; update(true, true); };
+for (const kind of ['normal', 'long', 'rtl', 'instrumental']) find(kind).onclick = () => { fixtureVersion++; state = replaceLyrics(state, fixture(kind), 40); find<HTMLInputElement>('time').max = '40'; update(true, true); };
 for (const kind of ['landscape', 'portrait']) find(kind).onclick = () => { portrait = kind === 'portrait'; iframe.style.maxWidth = portrait ? '390px' : '100%'; iframe.style.aspectRatio = portrait ? '390 / 844' : '16 / 9'; };
 find('capture').onclick = () => { if (mounted) send({ type: 'capture' }); };
 find('apply').onclick = () => {
@@ -80,7 +80,7 @@ find<HTMLInputElement>('fixture').onchange = async event => {
         if (file.size > 1024 * 1024) throw new Error('Fixture limit: 1 MiB.');
         const lines = validateLines(JSON.parse(await file.text())), duration = Math.max(1, ...lines.map(line => line.endTime)) + 6;
         if (version !== fixtureVersion) return;
-        state = { ...state, lines, time: 0, paused: true, duration }; find<HTMLInputElement>('time').max = String(duration); update(true, true); }
+        state = replaceLyrics(state, lines, duration); find<HTMLInputElement>('time').max = String(duration); update(true, true); }
     catch (error) { log('error', String(error)); }
 };
 find('check').onclick = async () => { try { const response = await fetch('check.json'); if (!response.ok) throw new Error(await response.text()); checkReport = await response.json(); log('check', JSON.stringify(checkReport)); } catch (error) { log('error', String(error)); } };

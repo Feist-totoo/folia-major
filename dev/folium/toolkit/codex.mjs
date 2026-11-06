@@ -22,3 +22,18 @@ export function runCodex(params) {
     if (result.status !== 0) throw new Error(result.stderr || 'Codex command failed');
     return result.stdout;
 }
+
+// Never overwrite another install's named MCP entry, and finish the backup before any mutation.
+export async function configureCodex(action, { server, node = process.execPath, run = runCodex, backup }) {
+    const own = entry => entry?.transport?.command === node && entry.transport.args?.length === 1 && entry.transport.args[0] === server;
+    if (action === 'connect') {
+        const current = JSON.parse(run(['mcp', 'list', '--json'])).find(entry => entry.name === 'folium-authoring');
+        if (current && !own(current)) throw new Error('folium-authoring belongs to another installation; no configuration changed.');
+        await backup();
+        return run(['mcp', 'add', 'folium-authoring', '--', node, server]);
+    }
+    if (action !== 'disconnect') throw new Error('Unknown Codex configuration action.');
+    if (!own(JSON.parse(run(['mcp', 'get', 'folium-authoring', '--json'])))) throw new Error('folium-authoring belongs to another installation; no configuration changed.');
+    await backup();
+    return run(['mcp', 'remove', 'folium-authoring']);
+}

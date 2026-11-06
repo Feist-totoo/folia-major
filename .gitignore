@@ -106,3 +106,7 @@ public/nebbia-strokes.json
 
 # Local Folium MCP client snippets contain machine-specific paths.
 dist-folium-mcp-clients/
+
+# Standalone Folium toolkit build cache and precompiled debugger assets.
+build/folium-tools-cache/
+dev/folium/studio/compiled/
