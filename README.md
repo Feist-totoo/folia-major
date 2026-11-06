@@ -178,6 +178,8 @@ Linux 包、Wayland / Hyprland 遥控窗和桌面端细节见 [技术与开发�
 
 风格包核心提供 API 1/2 规范、校验、确定性渲染与隔离 Worker。运行 `npm run style:new`、`style:pack`、`style:check` 制作并检查本地包，详见[运行时与 CLI](docs/style-pack-runtime.md)。
 
+播放器可导入和切换风格包；选择器区分完整视觉设计“个性”和歌词模板“样式”。
+
 ## 模组系统（Folium v1.x）
 
 > [!NOTE]

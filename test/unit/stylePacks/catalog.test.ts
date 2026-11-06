@@ -11,7 +11,7 @@ import { EXAMPLE_PACK } from '../../../src/stylePacks/example';
 // Classify by the user's intended role while keeping older files and the player's stored IDs stable.
 describe('personality and lyric-template contract', () => {
     it('covers each built-in exactly once, without treating random or the pack library as a template', () => {
-        expect(BUILTIN_STYLE_CATALOG.map(item => item.id).sort()).toEqual(BUILTIN_VISUALIZER_MODES.slice().sort());
+        expect(BUILTIN_STYLE_CATALOG.map(item => item.id).sort()).toEqual(BUILTIN_VISUALIZER_MODES.filter(id => id !== 'stylePack').sort());
         expect(BUILTIN_STYLE_CATALOG.filter(item => item.kind === 'personality').map(item => item.id)).toEqual(['sonnet', 'tempera', 'lumiere', 'hanabi', 'machi', 'nebbia']);
         expect(BUILTIN_STYLE_CATALOG.filter(item => item.kind === 'lyric-template').map(item => item.id)).toEqual([...LYRIC_TEMPLATE_IDS]);
         expect(styleGroup('random')).toBe('other'); expect(styleGroup('stylePack')).toBe('other'); expect(styleGroup('mod:custom:scene')).toBe('other');

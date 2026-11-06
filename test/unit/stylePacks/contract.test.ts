@@ -1,15 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { EXAMPLE_PACK } from '../../../src/stylePacks/example';
+import { RENDERER_PACK } from '../../../src/stylePacks/code/example';
 import { MAX_PACK_BYTES, parseStylePack, validateStylePack } from '../../../src/stylePacks/validate';
 import { layerTransform, resolvePackTypography } from '../../../src/stylePacks/render';
 import { fixtureFrame } from '../../../src/stylePacks/fixtures';
+import tuning from '../../../src/components/visualizer/stylePack/tuning';
 
 // Adversarial imports and deterministic seeking are part of the public pack contract.
 const copy = () => structuredClone(EXAMPLE_PACK);
 describe('style pack contract', () => {
-    it('round-trips a self-contained pack', () => {
+    it('round-trips a self-contained pack and its appearance tuning', () => {
         const pack = parseStylePack(JSON.stringify(EXAMPLE_PACK));
         expect(pack).toEqual(EXAMPLE_PACK);
+        expect(tuning.storage!.read({ pack })).toEqual({ pack });
     });
     it.each([
         ['future version', (p: any) => { p.schemaVersion = 99; }, '$.schemaVersion'],
@@ -28,6 +31,9 @@ describe('style pack contract', () => {
     });
     it('rejects malformed, prototype-shaped and oversized input', () => {
         for (const text of ['{', 'null', '[]', '{"__proto__": {}}', ' '.repeat(MAX_PACK_BYTES + 1)]) expect(() => parseStylePack(text)).toThrow();
+    });
+    it('recovers a corrupted saved selection', () => {
+        expect(tuning.storage!.read({ pack: { schemaVersion: 99 } })).toEqual({ pack: RENDERER_PACK });
     });
     it('evaluates motion from seek time, with no accumulated history', () => {
         const layer = { ...EXAMPLE_PACK.layers[0], motion: { kind: 'float' as const, amount: 2, period: 4, signal: 'time' as const } };
