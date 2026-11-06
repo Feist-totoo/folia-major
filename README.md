@@ -174,6 +174,10 @@ Linux 包、Wayland / Hyprland 遥控窗和桌面端细节见 [技术与开发�
 
 部署、环境变量、本地开发、Stage API、常用脚本和技术栈见 [技术与开发说明](docs/technical.md)。
 
+## 播放器风格包
+
+风格包核心提供 API 1/2 规范、校验、确定性渲染与隔离 Worker。运行 `npm run style:new`、`style:pack`、`style:check` 制作并检查本地包，详见[运行时与 CLI](docs/style-pack-runtime.md)。
+
 ## 模组系统（Folium v1.x）
 
 > [!NOTE]
