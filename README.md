@@ -174,15 +174,15 @@ Linux 包、Wayland / Hyprland 遥控窗和桌面端细节见 [技术与开发�
 
 部署、环境变量、本地开发、Stage API、常用脚本和技术栈见 [技术与开发说明](docs/technical.md)。
 
-## 播放器风格包
+## 播放器风格包与 Style Studio
 
-风格包核心提供 API 1/2 规范、校验、确定性渲染与隔离 Worker。运行 `npm run style:new`、`style:pack`、`style:check` 制作并检查本地包，详见[运行时与 CLI](docs/style-pack-runtime.md)。
+选择器区分完整视觉设计“个性”与可复用歌词模板“样式”。播放器、Studio、CLI 与 MCP 共用分类目录，旧包继续兼容。详见[分类及复用规范](skills/folia-style-art-direction/references/taxonomy.md)。
 
-播放器可导入和切换风格包；选择器区分完整视觉设计“个性”和歌词模板“样式”。
+Windows 用户可以单独安装 MCP 工具包与离线调试器，沿用现有播放器。运行 `npm run style:tools:build` 生成自带 Node 的安装器；安装、七个接口的真实自检与 Codex 接入见[安装与测试指南](docs/style-tools-installation.md)。播放器需要包含风格包加载器的版本才能导入 API 2 包。
 
-Agent 可接入[风格 MCP](docs/style-pack-mcp.md)，获取设计规范、源码参考和只读检查；支持 stdio 与认证的本机 HTTP。
+Web 和桌面端可搜索“风格包”导入 Agent 生成的 `.folia-style.json`。API 2 允许完整 Canvas/WebGL 程序设计逐字歌词、运镜和特效，并在隔离 Worker 中运行。配套 Style Studio 复用同一运行时，可离线编辑、截图、验收，也能从本地视频取帧/标注并导出 Agent 参考包。运行 `npm run style:build` 生成软件；详见 [规范和验收标准](docs/style-packs.md)、[Agent 指南](docs/style-pack-agent.md)、[内置设计基准](docs/style-pack-design-reference.md)。
 
-运行 `npm run style:studio` 打开调试器，或 `npm run style:build` 导出离线 Studio；支持本地视频参考和渲染验收。
+风格制作 Agent 可接入 [Folia 风格 MCP](docs/style-pack-mcp.md)：内嵌基于凝彩、花火、绘光和商籁的[审美 skill](skills/folia-style-art-direction/SKILL.md)，包含壁纸/视频重建经验、乐句编排、轨迹重复诊断和连续视觉验收。支持 stdio / 本机 Streamable HTTP；`npm run style:mcp:config` 导出 Codex、Claude、DeepSeek Harness、WorkBuddy 配置，`npm run style:mcp:doctor` 检查连接。客户端不支持 resources/prompts 时也能通过普通工具读取完整指导。
 
 ## 模组系统（Folium v1.x）
 

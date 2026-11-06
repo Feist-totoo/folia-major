@@ -2,8 +2,7 @@
 
 这是跨客户端的 Folia 风格制作 MCP，支持 stdio 和本机 Streamable HTTP。它把 [Folia 风格导演 skill](../skills/folia-style-art-direction/SKILL.md) 接入指导、源码查询和验证流程。服务端读取同一份内容；播放器渲染仍由 Style Studio / Folia 的 API 2 Worker 执行。
 
-
-当前为源码部署；独立安装工具在后续层提供。
+Windows 用户可使用[独立安装包](style-tools-installation.md)：包含运行时、MCP、离线 Studio 和本地源码打包工具，无需保留仓库。`npm run style:tools:build` 构建候选安装器，安装后用 `folia-style.cmd self-test` 测试全部七个工具、资源、提示与两种传输。下文的 npm/Node 命令适用于源码部署；独立安装的等价命令见安装指南。
 
 ## 架构与参考
 
@@ -111,3 +110,5 @@ npm run style:build
 测试会启动真实 stdio 进程与独立 SDK 客户端，检查发现/调用、资源/提示、各 JSON 配置的启动、tools-only 读取完整契约；还测试 HTTP 并发隔离、鉴权、Origin/Host、体积边界和断开恢复。数值测试覆盖轨迹诊断。`doctor` 的成功表示协议与工具工作，不表示每个宿主的模型回合或视觉质量均经过验证。未安装的客户端只能报告配置依据与 SDK 互通，不能声称 UI 实测。
 
 协议协商由钉定的 SDK 1.32.2 负责，提供 2025-11-25 及其支持的旧版本；不宣称实现 2026 新协议能力。能回退旧协议的现代客户端可连接。stdout 仅用于 stdio JSON-RPC，启动/错误信息到 stderr。依据：[生命周期](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)、[传输](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)。
+
+`style:build` 将 skill、本说明、`mcp-clients/` 配置一并放入离线 Studio；该命令导出的配置依赖本机源码。`style:tools:build` 另外构建自带运行时的独立安装包，客户端配置在安装后根据实际路径生成。视频参考 ZIP 附 skill 正文和参考，无 MCP 也能执行同样的设计与验收流程。skill 不包含原壁纸的第三方艺术素材。
