@@ -1,6 +1,6 @@
 # Folia 风格 MCP
 
-这是跨客户端的 Folia 风格制作 MCP，支持 stdio 和本机 Streamable HTTP。它把 [Folia 风格导演 skill](../skills/folia-style-art-direction/SKILL.md) 接入指导、源码查询和验证流程。服务端读取同一份内容；播放器渲染仍由 Folia 的 API 2 Worker 执行。
+这是跨客户端的 Folia 风格制作 MCP，支持 stdio 和本机 Streamable HTTP。它把 [Folia 风格导演 skill](../skills/folia-style-art-direction/SKILL.md) 接入指导、源码查询和验证流程。服务端读取同一份内容；播放器渲染仍由 Style Studio / Folia 的 API 2 Worker 执行。
 
 
 当前为源码部署；独立安装工具在后续层提供。
@@ -9,7 +9,7 @@
 
 参考本机 Android Studio 的 JetBrains MCP 插件：工具服务与客户端配置分开，同一服务提供多种接入方式；参考本机 Blender MCP 源码：MCP 进程与应用内部执行层分开，模型不直接取得渲染器进程权限。Folia 的 `service.mjs` 用官方 `@modelcontextprotocol/sdk` 注册统一 tools/resources/prompts；`server.mjs` 和 `http.mjs` 负责传输；`clientProfiles.mjs` 只序列化宿主配置。不会因为更换模型而换一套工具行为。
 
-Blender 参考的是本机 Blender Authors 的 `blender_mcp`：其 README 描述 stdio MCP → TCP → Blender add-on，`mcp/blmcp/tools_helpers/connection.py` 实现连接与超时。它与社区 `ahujasid/mcp-for-blender` 是不同项目。本次没有修改 Android Studio / Blender 的安装或配置。Folia 当前 MCP 不转发任意代码到渲染器；当前在播放器观察连续效果，Studio 调试器在后续层提供。
+Blender 参考的是本机 Blender Authors 的 `blender_mcp`：其 README 描述 stdio MCP → TCP → Blender add-on，`mcp/blmcp/tools_helpers/connection.py` 实现连接与超时。它与社区 `ahujasid/mcp-for-blender` 是不同项目。本次没有修改 Android Studio / Blender 的安装或配置。Folia 当前 MCP 不转发任意代码到渲染器；实际调试继续使用已有 Studio。
 
 官方接入依据：[JetBrains MCP](https://www.jetbrains.com/help/idea/mcp-server.html)、[Claude Code MCP](https://code.claude.com/docs/en/mcp)、[DeepSeek Harness MCP client](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/mcp/mcp-client/README.md)、[WorkBuddy Connector](https://open.workbuddy.cn/en/docs/connector)。
 
@@ -84,7 +84,7 @@ HTTP 绑定 `127.0.0.1`，验证 Bearer、Host，拒绝浏览器 Origin；不提
 
 1. `folia_style_brief({task, source, kind?, lyricTemplate?})`：source 为 original / wallpaper / video / revision。返回 skill 正文、分类、内置设计原则、动态验收；参考/修改任务附重建经验。还有项目路径、契约资源 URI 和制作命令。
 2. `folia_style_reference({style, file?, startLine?, lineCount?})`：支持目录中的全部 17 种内置风格。返回当前源码和行号，files 列出可读取的文件；单次至多 160 行。包含雾笺笔画描显、花火文字动画、绘光点亮/聚拢源码；只读白名单内的相关源码，不是任意文件浏览器。
-3. Agent 写设计方案和 renderer，导入播放器观看连续输出。`folia_style_review_motion({source, phrases})` 可比较实际轨迹，提示机械重复；source 是 `{kind: "rendered" | "planned", artifact: "证据路径"}`。具体采样格式见 skill 的动态验收参考；artifact 仅用于追溯，工具不打开视频、也不验证真实性。
+3. Agent 写设计方案和 renderer，在 Studio 观看连续输出。`folia_style_review_motion({source, phrases})` 可比较实际轨迹，提示机械重复；source 是 `{kind: "rendered" | "planned", artifact: "证据路径"}`。具体采样格式见 skill 的动态验收参考；artifact 仅用于追溯，工具不打开视频、也不验证真实性。
 4. `folia_style_check_pack({file})`：读取本地 JSON，使用播放器相同 validator；最大 4 MiB，不执行任何 renderer，不能代替运行或视觉验收。相对路径从仓库根目录算，绝对路径可指向用户的本地交付包。
 5. `folia_style_read_guide({topic})`：通过普通工具读取 skill、taxonomy、builtins、lyric-release、reconstruction、motion、renderer-api 或 specification 全文，供不支持 resources/prompts 的客户端使用。lyric-release 规定按素材艺术风格选择逐字、逐句或字词浮现组句，并约束节奏调速、间奏闲游、真实发射点与阅读停留；brief 自动包含这份规范。
 6. `folia_style_status({})`：检查服务环境、项目位置与可用指导，不启动播放器。
@@ -105,6 +105,7 @@ npm run typecheck
 npm run test:unit -- test/unit/stylePacks/mcp.test.ts
 npm run test:unit -- test/unit/stylePacks/mcpCompatibility.test.ts
 npm run style:mcp:doctor
+npm run style:build
 ```
 
 测试会启动真实 stdio 进程与独立 SDK 客户端，检查发现/调用、资源/提示、各 JSON 配置的启动、tools-only 读取完整契约；还测试 HTTP 并发隔离、鉴权、Origin/Host、体积边界和断开恢复。数值测试覆盖轨迹诊断。`doctor` 的成功表示协议与工具工作，不表示每个宿主的模型回合或视觉质量均经过验证。未安装的客户端只能报告配置依据与 SDK 互通，不能声称 UI 实测。

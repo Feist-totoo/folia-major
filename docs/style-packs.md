@@ -8,25 +8,42 @@
 
 API 1/2 新包可写 `kind: "personality" | "lyric-template"`；建议新交付明确填写。可选 `lyricTemplate` 记录十一种样式之一的 ID（例如 `classic`），仅表示参考来源，不自动加载或混合内置渲染器。未知类别和将 `hanabi`、`random` 等非样式 ID 作为模板都会拒绝。
 
-缺省 kind 的旧包继续接受，按个性兼容显示，不修改其内容、版本、ID 或存储键。旧版 validator 不一定认识新元数据，使用新增字段的包需要本次更新后的播放器。类别不代表格式或审美已验收。
+缺省 kind 的旧包继续接受，按个性兼容显示，不修改其内容、版本、ID 或存储键。旧版 validator 不一定认识新元数据，使用新增字段的包需要本次更新后的播放器/Studio。类别不代表格式或审美已验收。
 
-MCP `folia_style_catalog` 列出分类与真实源码；完整准则见 [个性与样式](../skills/folia-style-art-direction/references/taxonomy.md)。逐字、逐句、字词组句是另一条歌词释放轴，不能和个性/样式混淆。CLI 提供纯歌词起点；CLI：`style:new <新目录> <id> lyric-template`。
+MCP `folia_style_catalog` 列出分类与真实源码；完整准则见 [个性与样式](../skills/folia-style-art-direction/references/taxonomy.md)。逐字、逐句、字词组句是另一条歌词释放轴，不能和个性/样式混淆。Studio 提供纯歌词起点；CLI：`style:new <新目录> <id> lyric-template`。
 
-## 当前可用的制作流程
+风格包包含完整渲染代码、设置和内嵌素材。作者可用 Agent 生成逐字排版、运镜、转场、粒子与 WebGL 着色器；Folia 提供歌词/播放数据、装载、运行边界和验收工具。独立的 **StyleStudio.html** 与实际播放器使用相同的 Worker 运行时。
 
-本层提供播放器导入、CLI 和 MCP。独立 Studio、视频取帧、自动60项验收及 Windows 安装工具在后续层加入；当前通过播放器观察连续效果，用 CLI 校验格式，不能将格式成功称为渲染或审美通过。
+参考 [内置风格分析](style-pack-design-reference.md) 与 [Agent 指南](style-pack-agent.md)。旧图层格式仍可导入，见 [v1](style-packs-v1.md)。默认示例 **PRISM** 是可全部替换的独立程序，不是作者必须沿用的模板。
+
+## 使用与工具
+
+在命令面板搜索“风格包”，导入 `.folia-style.json` 后点“应用”。Web / Electron 均支持，无需开启 Folium。当前包随 `visualizerTunings.stylePack.pack` 进入外观备份、同步和 OBS 配置。安装库是本机收藏，最多 12 个；浏览器存储配额也可能先用尽。写入失败保留原库。删除收藏不改变已应用内容；同 ID 导入替换收藏，需再次应用才改变舞台。
 
 ```sh
+npm ci
+npm run style:studio
+# 已有 Vite 时直接打开 /style-studio.html
 npm run style:new -- my-stage my.stage
+# 修改 my-stage/renderer.js、manifest.json，可导入本地模块
 npm run style:pack -- my-stage my-stage.folia-style.json
 npm run style:check -- my-stage.folia-style.json
+npm run style:build
 ```
 
-在播放器命令面板搜索“风格包”导入并应用。完整数据协议和核心测试见 [核心说明](style-pack-runtime.md)。
+`style:pack` 把本地 JS 依赖编译成单个 IIFE。`style:check` 只校验格式，不执行程序。`style:build` 生成 `dist-style-studio/StyleStudio.html`，连同 Schema、API 类型、参考程序、文档和许可证分发。支持 OffscreenCanvas/Worker 的现代 Chromium 浏览器可双击离线运行，无需 Node、登录平台或启动 Folia。
+
+Studio 提供 JavaScript 编辑、包清单 JSON、播放/暂停/跳转、横竖屏、明暗、减少动态效果、四种歌词场景、封面加载、PNG 和验收报告。代码错误显示堆栈。测试数据是原创文字与合成分析信号，不播放声音。显示的 Worker CPU p95 不是实际帧率。
+
+### 视频 → Agent → 风格包
+
+打开“视频效果参考”，载入本地视频（浏览器可解码、最多 250 MiB），选择最多 60 秒片段，提取 8 个等距帧。在任意视频时刻添加效果说明，导出含 JPEG、准确时间点、视频元数据、标注和 Agent 任务说明的 ZIP。视频留在本机，不上传服务端。
+
+将原视频、参考 ZIP、规范和 API 类型交给 Agent。Agent 分析视觉规则并编写渲染代码，再导回工具对照视频。取帧是辅助证据，**不是自动镜头检测，也不是从视频恢复源码**；快速转场仍需观看原视频。视频可独立播放，舞台时间轴用于调试生成程序。
 
 ## 文件协议
 
-UTF-8 JSON，总大小 ≤ **4 MiB**，未知字段拒绝。机器规范源头为 `src/stylePacks/code/schema.ts`。
+UTF-8 JSON，总大小 ≤ **4 MiB**，未知字段拒绝。机器规范为 `renderer-pack.schema.json`（源头 `src/stylePacks/code/schema.ts`）。
 
 | 字段 | 内容 |
 | --- | --- |
@@ -69,8 +86,6 @@ FoliaStyle.define(context => {
 Worker 的死循环可被超时终止；这是故障隔离，不是运行任意敌对程序的完整资源配额系统。大量 GPU 分配仍会影响设备，作者必须做性能验收。语法错误、Promise rejection、运行错误和超时均停止 Worker；主播放器回退 Still，音频继续。换包可重试。卸载移除 iframe、RAF、观察器、监听与 blob URL，并停止 Worker。v1 保持 Canvas 2D 路径。
 
 ## 验收标准
-
-以下是完整制作链路的目标。Studio、自动验收与离线 HTML 相关项尚需后续工具接入，当前不得报告这些项已通过。
 
 | ID | 检查内容 | 通过条件 |
 | --- | --- | --- |

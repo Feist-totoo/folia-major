@@ -3,6 +3,7 @@ import { RENDERER_PACK } from '../../../src/stylePacks/code/example';
 import { EXAMPLE_PACK } from '../../../src/stylePacks/example';
 import { formatStylePack, parseStylePack, validateStylePack } from '../../../src/stylePacks/validate';
 import { makeCodeScene } from '../../../src/stylePacks/code/scene';
+import { referenceTimes } from '../../../src/stylePacks/video/videoReference';
 
 // New executable inputs stay bounded; lyric timing and video evidence preserve their source coordinates.
 describe('renderer pack v2', () => {
@@ -37,5 +38,12 @@ describe('renderer pack v2', () => {
         const scene = makeCodeScene([{ fullText: 'AB', startTime: 10, endTime: 15, words: [{ text: 'A', startTime: 10, endTime: 11 }, { text: 'B', startTime: 13, endTime: 15 }], sourceToken: 'private' } as any]);
         expect(scene.lines[0].glyphs).toEqual([{ text: 'A', start: 10, end: 11 }, { text: 'B', start: 13, end: 15 }]);
         expect(JSON.stringify(scene)).not.toContain('private');
+    });
+    it('samples the selected video interval without losing absolute timestamps', () => {
+        const times = referenceTimes(12, 26);
+        expect(times).toHaveLength(8); expect(times[0]).toBe(12); expect(times.at(-1)).toBe(26);
+        expect(() => referenceTimes(26, 12)).toThrow();
+        expect(() => referenceTimes(0, 61)).toThrow();
+        expect(() => referenceTimes(NaN, 2)).toThrow();
     });
 });

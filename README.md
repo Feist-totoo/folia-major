@@ -182,6 +182,8 @@ Linux 包、Wayland / Hyprland 遥控窗和桌面端细节见 [技术与开发�
 
 Agent 可接入[风格 MCP](docs/style-pack-mcp.md)，获取设计规范、源码参考和只读检查；支持 stdio 与认证的本机 HTTP。
 
+运行 `npm run style:studio` 打开调试器，或 `npm run style:build` 导出离线 Studio；支持本地视频参考和渲染验收。
+
 ## 模组系统（Folium v1.x）
 
 > [!NOTE]

@@ -8,7 +8,7 @@ import { BUILTIN_STYLE_CATALOG, builtinStyle } from '../../../src/stylePacks/cat
 export const root = fileURLToPath(new URL('../../../', import.meta.url));
 export const installation = existsSync(path.join(root, 'studio/StyleStudio.html'))
     ? { mode: 'standalone', cli: path.resolve(root, '../folia-style.cmd'), studio: path.join(root, 'studio/StyleStudio.html') }
-    : { mode: 'checkout', cli: null, studio: null };
+    : { mode: 'checkout', cli: null, studio: 'npm run style:studio' };
 const skill = 'skills/folia-style-art-direction/';
 export const documents = {
     skill: { path: `${skill}SKILL.md`, description: 'Folia 风格导演：制作和审美复查工作流' },
@@ -60,5 +60,5 @@ export async function brief({ task, source = 'original', kind = 'personality', l
         installation,
         commands: installation.mode === 'standalone'
             ? { usage: 'Run the absolute installation.cli path with these arguments. It contains its own Node runtime.', studio: 'studio', pack: 'pack <source-dir> <output.json>', check: 'check <pack.json>', create: 'new <source-dir> [id]' }
-            : { pack: 'npm run style:pack -- <source-dir> <output.json>', check: 'npm run style:check -- <pack.json>' } };
+            : { studio: 'npm run style:studio', offline: 'npm run style:build', pack: 'npm run style:pack -- <source-dir> <output.json>', check: 'npm run style:check -- <pack.json>' } };
 }

@@ -18,6 +18,8 @@
   "scripts": {
     "dev": "vite",
     "dev:probe": "vite --open /dev-probe.html",
+    "style:studio": "vite --open /style-studio.html",
+    "style:build": "node dev/stylePacks/build.mjs",
     "style:check": "node dev/stylePacks/check.mjs",
     "style:new": "node dev/stylePacks/new.mjs",
     "style:pack": "node dev/stylePacks/pack.mjs",
