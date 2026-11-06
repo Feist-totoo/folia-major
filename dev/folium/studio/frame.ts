@@ -56,12 +56,12 @@ window.addEventListener('message', event => {
     const message = event.data;
     void (async () => {
         if (message.type === 'load') await activate(message.id, message.state);
-        else if (message.type === 'state' && preview) {
+        else if (message.type === 'state' && state) {
             const next = message.state as PreviewState;
             const remount = next.staticMode !== state.staticMode || next.staticLineIndex !== state.staticLineIndex || message.newLyrics;
             state = { ...next, time: message.seek ? next.time : state.time, lines: message.newLyrics ? validateLines(next.lines) : state.lines };
             root.style.background = state.theme.backgroundColor;
-            if (remount) await mount(); else preview.update(state);
+            if (preview) { if (remount) await mount(); else preview.update(state); }
         } else if (message.type === 'mode') { selected = message.id; await mount(); }
         else if (message.type === 'capture') {
             const canvas = root.querySelector('canvas'); if (!canvas) throw new Error('PNG export requires a canvas visualizer; use browser capture for DOM content.');
