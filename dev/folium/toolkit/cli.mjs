@@ -35,7 +35,8 @@ try {
         console.info(await configureCodex(command === 'connect-codex' ? 'connect' : 'disconnect', { server, backup: backupCodex }));
     } else if (command === 'studio') {
         const entry = path.join(root, 'dev/folium/studio/cli.mjs');
-        process.argv = [process.execPath, entry, ...(args.length ? args : [path.join(root, 'mods/sample-aurora-visualizer')])];
+        const studioArgs = args[0] && !args[0].startsWith('--') ? args : [path.join(root, 'mods/sample-aurora-visualizer'), ...args];
+        process.argv = [process.execPath, entry, ...studioArgs];
         await import('../studio/cli.mjs');
     } else if (command === 'pack') {
         const { packMod } = await import('./pack.mjs');

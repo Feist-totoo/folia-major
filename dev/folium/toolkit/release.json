@@ -1,7 +1,7 @@
 {
   "name": "Folium Authoring Tools",
-  "version": "0.1.0-rc.1",
-  "windowsVersion": "0.1.0.1",
+  "version": "0.1.0-rc.2",
+  "windowsVersion": "0.1.0.2",
   "nodeVersion": "24.15.0",
   "platform": "win32-x64"
 }
