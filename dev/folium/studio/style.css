@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+/* Standalone authoring UI; all fixed styling uses the project's Tailwind design primitives. */
+body { @apply m-0 bg-slate-950 text-slate-100 font-sans; }
+#app { @apply mx-auto max-w-7xl p-5 space-y-5; }
+header { @apply flex flex-wrap items-center justify-between gap-4; }
+h1 { @apply text-2xl font-semibold tracking-tight; }
+h2 { @apply text-base font-semibold mb-2; }
+p { @apply text-sm text-slate-400 leading-relaxed; }
+button,.file { @apply inline-flex items-center justify-center rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm cursor-pointer transition-colors; }
+button:hover,.file:hover { @apply bg-slate-700; }
+button:disabled { @apply opacity-40 cursor-not-allowed; }
+button[aria-pressed='true'] { @apply border-teal-300 text-teal-200; }
+button:focus-visible,input:focus-visible,textarea:focus-visible { @apply outline-2 outline-offset-2 outline-teal-300; }
+input,textarea { @apply rounded-md bg-slate-900 border border-slate-700 p-2 text-sm; }
+input[type='range'] { @apply w-full accent-teal-300; }
+label { @apply inline-flex flex-col gap-1 text-xs text-slate-300; }
+.controls,.toolbar,.modes { @apply flex flex-wrap items-end gap-2; }
+.panel { @apply rounded-xl border border-slate-800 bg-slate-900/50 p-4 space-y-3; }
+.stage-wrap { @apply flex justify-center bg-black/40 rounded-xl overflow-hidden; }
+iframe { @apply border-0 w-full aspect-video bg-slate-950; }
+textarea { @apply w-full min-h-24 font-mono; }
+pre { @apply whitespace-pre-wrap break-words text-xs text-slate-300 max-h-52 overflow-auto; }
+video { @apply w-full max-h-72 rounded-lg bg-black; }
+.file input { @apply max-w-56; }
+.reference-frames { @apply grid grid-cols-2 md:grid-cols-4 gap-2; }
+.reference-frames img { @apply w-full rounded-md; }
+.muted,.video-status { @apply text-xs text-slate-400 whitespace-pre-wrap; }
+.clip-start,.clip-end { @apply w-24; }
+.note { @apply min-w-64; }
